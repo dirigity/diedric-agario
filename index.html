@@ -1,0 +1,487 @@
+<html><head><style>
+    teniente{
+        display:none;
+    }
+    Boton{
+        border: 3px solid Black;
+        padding: 1px;
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+    Caja{
+        border: 3px solid Black;
+        display: block;
+        padding: 10px
+    }
+    canvas{
+        border: 3px solid Black;
+    }
+    mobil{
+        border: 3px solid Black;
+        padding: 5px;
+
+    }
+    PC{
+        border: 3px solid Black;
+        padding: 5px;
+        background-color: #8d8d8d;
+
+    }
+    spacer{
+        height: 150px;
+        width: 150px;
+        display: inline-block;
+    }
+    b{
+        height: 140px;
+        width: 140px;
+        background-color: grey;
+        border: 3px solid Black;
+        display: inline-block;
+
+    }
+</style></head>
+
+<body onload="Launch()">
+    <canvas id="PH" width="440" height="440" onclick="PH"></canvas>
+    <canvas id="PV" width="440" height="440" onclick="PV"></canvas>
+    <br>
+    <caja style="padding: 2px; display: inline-block" id="MobileControls">
+        <Spacer>                                          </Spacer><Spacer><b onclick = "wdown()" on-release="wup()"></b></Spacer><Spacer>                                          </Spacer><Spacer>                                              </Spacer><Spacer><b onclick = "idown()" on-release="iup()"></b></Spacer><br>
+        <Spacer><b onclick = "adown()" on-release="aup()"></b></Spacer><Spacer>                                          </Spacer><Spacer><b onclick = "ddown()" on-release="dup()"></b></Spacer><Spacer><b onclick = "jdown()" on-release="jup()"></b></Spacer><Spacer>                                          </Spacer><Spacer><b onclick = "ldown()" on-release="lup()"></b></Spacer><br>
+        <Spacer>                                          </Spacer><Spacer><b onclick = "sdown()" on-release="sup()"></b></Spacer><Spacer>                                          </Spacer><Spacer>                                              </Spacer><Spacer><b onclick = "kdown()" on-release="kup()"></b></Spacer><br>
+    </caja>
+    
+    <Boton onclick="startGame()" id="MainButton">START!!</Boton><br><br>
+    <Caja>
+        <Boton onclick="OptionsTogle()" id="options button">Advanced options [\/]</Boton>
+        <teniente id="Options">
+            <br><t>Food number: </t><input type="text" 
+            id="Food" 
+            placeholder="10-100"  
+            minlength="2" 
+            maxlength="3"><br>
+
+            <br><t>Dificulty: </t><input type="text" 
+            id="Dificulty" 
+            placeholder="10-100"  
+            minlength="2" 
+            maxlength="3"><br>
+
+            <br><t>Enemies number: </t><input type="text" 
+            id="Enemies" 
+            placeholder="10-100"  
+            minlength="2" 
+            maxlength="3"><br>
+
+            <br><t>speed Time between ticks </t><input type="text" 
+            id="Speed" 
+            placeholder="10-100"  
+            minlength="2" 
+            maxlength="3"><br>
+
+            <br><mobil id="mobilDisplay" onclick="toggleInterface()"> Mobile </mobil>
+                <PC    id="PCDisplay"    onclick="toggleInterface()"> PC     </PC><br>
+
+            <br><Boton onclick="ApplyOptions()"> Apply </Boton>
+
+        </teniente>
+    </Caja>
+
+    <script>
+        var Dificulty;
+        var Enemies = 10;
+        var Food = 10;
+        var WorldSize = 440;
+        var Speed = 100;
+        var Playing = false
+        var DataBase = new Array(0);
+        var mobil = false
+
+        var a = false;
+        var s = false;
+        var d = false;
+        var w = false;
+        var j = false;
+        var k = false;
+        var l = false;
+        var i = false;
+
+        function toggleInterface(){
+            if(mobil){
+                mobil = false;
+                document.getElementById("MobileControls").style.display="none";
+                document.getElementById("mobilDisplay").style.backgroundColor = "White";
+                document.getElementById("PCDisplay").style.backgroundColor = "#8d8d8d";
+
+
+            }else{
+                mobil = true;
+                document.getElementById("MobileControls").style.display="inline-block";
+                document.getElementById("mobilDisplay").style.backgroundColor = "#8d8d8d";
+                document.getElementById("PCDisplay").style.backgroundColor = "White";
+            }
+        }
+
+        function startGame() {
+            if(Playing==false){
+                while(DataBase.length > 0) {
+                    DataBase.pop();
+                }
+                document.getElementById("MainButton").innerHTML="STOP!!";
+                console.log("Started");
+                Playing = true;
+                for (let i = 0; i < Enemies; i++) {    
+                    let Data = new Array(9)
+                    Data.Type = "TioXungo";
+                    Data.X = GetRandom()*WorldSize;
+                    Data.Y = GetRandom()*WorldSize;
+                    Data.Z = GetRandom()*WorldSize;
+                    Data.VX = 1;
+                    Data.VY = 1;
+                    Data.VZ = 1;
+                    Data.DVX = -1; 
+                    Data.DVY = -1;
+                    Data.DVZ = -1;
+                    DataBase.push(Data);
+                }
+                
+                for (let i = 0; i < Food; i++) {    
+                    let Data = new Array(9)
+                    Data.Type = "Comida";
+                    Data.X = GetRandom()*WorldSize;
+                    Data.Y = GetRandom()*WorldSize;
+                    Data.Z = GetRandom()*WorldSize;
+                    Data.VX = 1;
+                    Data.VY = 1;
+                    Data.VZ = 1;
+                    Data.DVX = -1; 
+                    Data.DVY = -1;
+                    Data.DVZ = -1;
+                    DataBase.push(Data);
+                }
+                let Data = new Array(6)
+                    Data.Type = "Player";
+                    Data.X = 1/2*WorldSize;
+                    Data.Y = 1/2*WorldSize;
+                    Data.Z = 1/2*WorldSize;
+                    Data.VX = 0;
+                    Data.VY = 0;
+                    Data.VZ = 0;
+                    DataBase.push(Data);
+                
+                Tick();
+            }else{
+                document.getElementById("MainButton").innerHTML="START!!";
+                Playing=false;
+                console.log("Stopped");
+            }
+        }
+
+        function StartDrawing(canvas){
+            var context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        function GetRandom() {
+            let ret = Math.random();
+            console.log("GetRandom:" + ret );
+            return ret;
+        }
+        function Tick() {
+            let PH = document.getElementById("PH");
+            let PV = document.getElementById("PV");
+            StartDrawing(PH);
+            StartDrawing(PV);
+            for (let i = 0; i < DataBase.length; i++) {
+                console.log("Drawing Enemy "+i)
+                let Dra = DataBase[i];
+                if(Dra.Type=="TioXungo"){
+                    DrawCircleIn(PV,Dra.X,Dra.Y,5,'red');
+                    DrawCircleIn(PH,Dra.Z,Dra.Y,5,'red');
+                    
+                    if(Dra.DVX==Dra.VX)if(Dra.DVY==Dra.VY)if(Dra.DVZ==Dra.VZ)if (GetRandom()*100>99) {
+                        Turn(Dra);
+                    }
+
+                    if(Dra.X + Dra.VX < PV.width-5 && Dra.X + Dra.VX>5){
+                        Dra.X = Dra.X + Dra.VX;
+                    } else Turn(Dra);
+                    if(Dra.Y + Dra.VY < PV.width-5 && Dra.Y + Dra.VY>5){
+                        Dra.Y = Dra.Y + Dra.VY;
+                    } else Turn(Dra);
+                    if(Dra.Z + Dra.VZ < PV.width-5 && Dra.Z + Dra.VZ>5){
+                        Dra.Z = Dra.Z + Dra.VZ;
+                    } else Turn(Dra);
+                    if(Dra.VX != Dra.DVX){
+                        if(Math.abs(Dra.VX+1-Dra.DVX)<Math.abs(Dra.VX-1-Dra.DVX)){
+                            Dra.VX = Dra.VX+1;
+                        }
+                        if(Math.abs(Dra.VX+1-Dra.DVX)>Math.abs(Dra.VX-1-Dra.DVX)){
+                            Dra.VX = Dra.VX-1;
+                        }
+                    }
+                    if(Dra.VY != Dra.DVY){
+                        if(Math.abs(Dra.VY+1-Dra.DVY)<Math.abs(Dra.VY-1-Dra.DVY)){
+                            Dra.VY = Dra.VY+1;
+                        }
+                        if(Math.abs(Dra.VY+1-Dra.DVY)>Math.abs(Dra.VY-1-Dra.DVY)){
+                            Dra.VY = Dra.VY-1;
+                        }
+                    }
+                    if(Dra.VZ != Dra.DVZ){
+                        if(Math.abs(Dra.VZ+1-Dra.DVZ)<Math.abs(Dra.VZ-1-Dra.DVZ)){
+                            Dra.VZ = Dra.VZ+1;
+                        }
+                        if(Math.abs(Dra.VZ+1-Dra.DVZ)>Math.abs(Dra.VZ-1-Dra.DVZ)){
+                            Dra.VZ = Dra.VZ-1;
+                        }
+                    }
+                }
+                if(Dra.Type=="Comida"){
+                    DrawCircleIn(PV,Dra.X,Dra.Y,5,'Blue');
+                    DrawCircleIn(PH,Dra.Z,Dra.Y,5,'Blue');
+                    
+                    if(Dra.DVX==Dra.VX)if(Dra.DVY==Dra.VY)if(Dra.DVZ==Dra.VZ)if (GetRandom()*100>99) {
+                        Turn(Dra);
+                    }
+
+                    if(Dra.X + Dra.VX < PV.width-5 && Dra.X + Dra.VX>5){
+                        Dra.X = Dra.X + Dra.VX;
+                    } else Turn(Dra);
+                    if(Dra.Y + Dra.VY < PV.width-5 && Dra.Y + Dra.VY>5){
+                        Dra.Y = Dra.Y + Dra.VY;
+                    } else Turn(Dra);
+                    if(Dra.Z + Dra.VZ < PV.width-5 && Dra.Z + Dra.VZ>5){
+                        Dra.Z = Dra.Z + Dra.VZ;
+                    } else Turn(Dra);
+                    if(Dra.VX != Dra.DVX){
+                        if(Math.abs(Dra.VX+1-Dra.DVX)<Math.abs(Dra.VX-1-Dra.DVX)){
+                            Dra.VX = Dra.VX+1;
+                        }
+                        if(Math.abs(Dra.VX+1-Dra.DVX)>Math.abs(Dra.VX-1-Dra.DVX)){
+                            Dra.VX = Dra.VX-1;
+                        }
+                    }
+                    if(Dra.VY != Dra.DVY){
+                        if(Math.abs(Dra.VY+1-Dra.DVY)<Math.abs(Dra.VY-1-Dra.DVY)){
+                            Dra.VY = Dra.VY+1;
+                        }
+                        if(Math.abs(Dra.VY+1-Dra.DVY)>Math.abs(Dra.VY-1-Dra.DVY)){
+                            Dra.VY = Dra.VY-1;
+                        }
+                    }
+                    if(Dra.VZ != Dra.DVZ){
+                        if(Math.abs(Dra.VZ+1-Dra.DVZ)<Math.abs(Dra.VZ-1-Dra.DVZ)){
+                            Dra.VZ = Dra.VZ+1;
+                        }
+                        if(Math.abs(Dra.VZ+1-Dra.DVZ)>Math.abs(Dra.VZ-1-Dra.DVZ)){
+                            Dra.VZ = Dra.VZ-1;
+                        }
+                    }
+                }   
+                if(Dra.Type=="Player"){
+                    DrawCircleIn(PV,Dra.X,Dra.Y,5,'Green');
+                    DrawCircleIn(PH,Dra.Z,Dra.Y,5,'Green');
+                }
+            }
+            if(Playing){
+                console.log("Tick!!");
+                setTimeout(function() {
+                    Wait()
+                }, Speed);
+            }
+        }
+
+        function mayIMove(Dra){
+            var ret = true;
+            var newX = Dra.X + Dra.VX;
+            var newY = Dra.Y + Dra.VY;
+            var newZ = Dra.Z + Dra.VZ;
+            if(!(newX < PV.width-5 && newX > 5)){
+                ret = false
+            }
+            if(!(newY < PV.width-5 && newY > 5)){
+                ret = false
+            }
+            if(!(newZ < PV.width-5 && newZ > 5)){
+                ret = false
+            }
+            for (let index = 0; index < DataBase.length; index++) {
+                const element = DataBase[index];
+                if(distanceFrom(Dra,element)){
+                    ret = false;
+                }
+                
+            }
+        }
+
+        function distanceFrom(Dra1,Dra2){
+            var x1 = Dra1.X;
+            var x2 = Dra2.x;
+            var y1 = Dra1.y;
+            var y2 = Dra2.y;
+            var z1 = Dra1.z;
+            var z2 = Dra2.z;
+
+            return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
+        }
+
+        function Turn(Dra) {
+            
+            var VXT = MenosUnoCeroOUno();
+            var VYT = MenosUnoCeroOUno();
+            var VZT = MenosUnoCeroOUno();
+
+            console.log("Turning! "+VXT+" - "+VYT+" - "+VYT);
+            Dra.DVX = VXT
+            Dra.DVY = VYT
+            Dra.DVZ = VZT
+        }
+
+        function MenosUnoCeroOUno() {
+            let r = GetRandom()*1000;
+            console.log(r)
+            if(r<333){
+                console.log("to -1")
+                return -1;
+            }
+            if(r>333)if(r<666){
+                console.log("to 0")
+                return 0;
+            }
+            if(r>666){
+                console.log("to 1")
+                return 1;
+            }
+        }
+
+        function Wait(){
+            console.log("Tock!!")
+            Tick();
+        }
+
+        function Launch() {
+            document.getElementById("Options").style.display = "none";
+            document.getElementById("MobileControls").style.display="none";
+
+        }
+        function OptionsTogle() {
+            var teniente = document.getElementById("Options");
+            var boton = document.getElementById("options button");
+            if (teniente.style.display == "none") {
+                teniente.style.display = "block";
+                console.log("block");
+                boton.innerHTML = "Advanced options [/\\]"
+            } else {
+                teniente.style.display = "none";
+                boton.innerHTML = "Advanced options [\\/]"
+            }
+        }
+
+        function ApplyOptions() {
+            Food = document.getElementById("Food").value;
+            Enemies = document.getElementById("Enemies").value;
+            Dificulty = document.getElementById("Dificulty").value;
+            Speed = document.getElementById("Speed").value;
+        }
+
+        function DrawCircleIn(canvas,x,y,r,c) {
+            var context = canvas.getContext('2d');
+            context.beginPath();
+            context.arc(x, y, r, 0, 2 * Math.PI, false);
+            context.fillStyle = c;
+            context.fill();
+            context.lineWidth = 1;
+            context.strokeStyle = 'Black';
+            context.stroke();
+        }
+
+        //listeners
+
+        window.onkeydown = function (e) {
+            var code = e.keyCode ? e.keyCode : e.which;
+            
+            if (code === 87) {w = true;
+            } else if (code === 65) {a = true;
+            } else if (code === 83) {s = true;
+            } else if (code === 68) {d = true;
+            } else if (code === 73) {i = true;
+            } else if (code === 74) {j = true;
+            } else if (code === 75) {k = true;
+            } else if (code === 76) {l = true;
+            }
+        };
+        window.onkeyup = function (e) {
+            var code = e.keyCode ? e.keyCode : e.which;
+            
+            if (code === 87) {
+                w = false;
+            } else if (code === 65) {
+                a = false;
+            } else if (code === 83) {
+                s = false;
+            } else if (code === 68) {
+                d = false;
+            } else if (code === 73) {
+                i = false;
+            } else if (code === 74) {
+                j = false;
+            } else if (code === 75) {
+                k = false;
+            } else if (code === 76) {
+                l = false;
+            }
+        };
+
+        function aup(){
+            a = true;
+        }
+        function adown(){
+            a = true;
+        }
+        function wup(){
+            w = true;
+        }
+        function wdown(){
+            w = true;
+        }
+        function sup(){
+            s = true;
+        }
+        function sdown(){
+            s = true;
+        }
+        function dup(){
+            d = true;
+        }
+        function ddown(){
+            d = true;
+        }
+        function jup(){
+            j = true;
+        }
+        function jdown(){
+            j = true;
+        }
+        function iup(){
+            i = true;
+        }
+        function idown(){
+            i = true;
+        }
+        function kup(){
+            k = true;
+        }
+        function kdown(){
+            k = true;
+        }
+        function lup(){
+            l = true;
+        }
+        function ldown(){
+            l = true;
+        }
+
+
+    </script>
+</body></html>
