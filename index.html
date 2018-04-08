@@ -82,6 +82,12 @@
             minlength="2" 
             maxlength="3"><br>
 
+            <br><t>speed Time between ia steps </t><input type="text" 
+            id="cadaCuantoSeMueven" 
+            placeholder="10-100"  
+            minlength="2" 
+            maxlength="3"><br>
+
             <br><mobil id="mobilDisplay" onclick="toggleInterface()"> Mobile </mobil>
                 <PC    id="PCDisplay"    onclick="toggleInterface()"> PC     </PC><br>
 
@@ -92,13 +98,16 @@
 
     <script>
         var Dificulty;
-        var Enemies = 10;
-        var Food = 10;
+        var Enemies = 4;
+        var Food = 4;
         var WorldSize = 440;
-        var Speed = 100;
+        var Speed = 20;
+        var cadaCuantoSeMueven = 4;
         var Playing = false
         var DataBase = new Array(0);
         var mobil = false
+        var tickCounter = 0;
+        var puntuation = 0;
 
         var a = false;
         var s = false;
@@ -126,40 +135,42 @@
         }
 
         function startGame() {
+            tickCounter = 0;
             if(Playing==false){
                 while(DataBase.length > 0) {
                     DataBase.pop();
                 }
                 document.getElementById("MainButton").innerHTML="STOP!!";
-                console.log("Started");
                 Playing = true;
-                for (let i = 0; i < Enemies; i++) {    
-                    let Data = new Array(9)
+                for (let b = 0; b < Enemies; b++) {    
+                    let Data = new Array(11)
                     Data.Type = "TioXungo";
-                    Data.X = GetRandom()*WorldSize;
-                    Data.Y = GetRandom()*WorldSize;
-                    Data.Z = GetRandom()*WorldSize;
+                    Data.X = (GetRandom()*(WorldSize-10))+5;
+                    Data.Y = (GetRandom()*(WorldSize-10))+5;
+                    Data.Z = (GetRandom()*(WorldSize-10))+5;
                     Data.VX = 1;
                     Data.VY = 1;
                     Data.VZ = 1;
                     Data.DVX = -1; 
                     Data.DVY = -1;
                     Data.DVZ = -1;
+                    Data.Life="alive";
                     DataBase.push(Data);
                 }
                 
-                for (let i = 0; i < Food; i++) {    
-                    let Data = new Array(9)
+                for (let b = 0; b < Food; b++) {    
+                    let Data = new Array(11)
                     Data.Type = "Comida";
-                    Data.X = GetRandom()*WorldSize;
-                    Data.Y = GetRandom()*WorldSize;
-                    Data.Z = GetRandom()*WorldSize;
+                    Data.X = (GetRandom()*(WorldSize-10))+5;
+                    Data.Y = (GetRandom()*(WorldSize-10))+5;
+                    Data.Z = (GetRandom()*(WorldSize-10))+5;
                     Data.VX = 1;
                     Data.VY = 1;
                     Data.VZ = 1;
                     Data.DVX = -1; 
                     Data.DVY = -1;
                     Data.DVZ = -1;
+                    Data.Life="alive";
                     DataBase.push(Data);
                 }
                 let Data = new Array(6)
@@ -176,7 +187,6 @@
             }else{
                 document.getElementById("MainButton").innerHTML="START!!";
                 Playing=false;
-                console.log("Stopped");
             }
         }
 
@@ -186,108 +196,141 @@
         }
         function GetRandom() {
             let ret = Math.random();
-            console.log("GetRandom:" + ret );
             return ret;
         }
         function Tick() {
+            tickCounter++;
             let PH = document.getElementById("PH");
             let PV = document.getElementById("PV");
             StartDrawing(PH);
             StartDrawing(PV);
-            for (let i = 0; i < DataBase.length; i++) {
-                console.log("Drawing Enemy "+i)
-                let Dra = DataBase[i];
-                if(Dra.Type=="TioXungo"){
+            for (let b = 0; b < DataBase.length; b++) {
+                let Dra = DataBase[b];
+                Toca = tickCounter%cadaCuantoSeMueven==0;
+                if(Dra.Type=="TioXungo"&&Dra.Life=="alive"){
                     DrawCircleIn(PV,Dra.X,Dra.Y,5,'red');
                     DrawCircleIn(PH,Dra.Z,Dra.Y,5,'red');
-                    
-                    if(Dra.DVX==Dra.VX)if(Dra.DVY==Dra.VY)if(Dra.DVZ==Dra.VZ)if (GetRandom()*100>99) {
-                        Turn(Dra);
-                    }
+                    if(Toca){
+                        if(Dra.DVX==Dra.VX)if(Dra.DVY==Dra.VY)if(Dra.DVZ==Dra.VZ)if (GetRandom()*100>99) {
+                            Turn(Dra);
+                        }
 
-                    if(Dra.X + Dra.VX < PV.width-5 && Dra.X + Dra.VX>5){
-                        Dra.X = Dra.X + Dra.VX;
-                    } else Turn(Dra);
-                    if(Dra.Y + Dra.VY < PV.width-5 && Dra.Y + Dra.VY>5){
-                        Dra.Y = Dra.Y + Dra.VY;
-                    } else Turn(Dra);
-                    if(Dra.Z + Dra.VZ < PV.width-5 && Dra.Z + Dra.VZ>5){
-                        Dra.Z = Dra.Z + Dra.VZ;
-                    } else Turn(Dra);
-                    if(Dra.VX != Dra.DVX){
-                        if(Math.abs(Dra.VX+1-Dra.DVX)<Math.abs(Dra.VX-1-Dra.DVX)){
-                            Dra.VX = Dra.VX+1;
+                        if(Dra.X + Dra.VX < PV.width-5 && Dra.X + Dra.VX>5){
+                            Dra.X = Dra.X + Dra.VX;
+                        } else Turn(Dra);
+                        if(Dra.Y + Dra.VY < PV.width-5 && Dra.Y + Dra.VY>5){
+                            Dra.Y = Dra.Y + Dra.VY;
+                        } else Turn(Dra);
+                        if(Dra.Z + Dra.VZ < PV.width-5 && Dra.Z + Dra.VZ>5){
+                            Dra.Z = Dra.Z + Dra.VZ;
+                        } else Turn(Dra);
+                        if(Dra.VX != Dra.DVX){
+                            if(Math.abs(Dra.VX+1-Dra.DVX)<Math.abs(Dra.VX-1-Dra.DVX)){
+                                Dra.VX = Dra.VX+1;
+                            }
+                            if(Math.abs(Dra.VX+1-Dra.DVX)>Math.abs(Dra.VX-1-Dra.DVX)){
+                                Dra.VX = Dra.VX-1;
+                            }
                         }
-                        if(Math.abs(Dra.VX+1-Dra.DVX)>Math.abs(Dra.VX-1-Dra.DVX)){
-                            Dra.VX = Dra.VX-1;
+                        if(Dra.VY != Dra.DVY){
+                            if(Math.abs(Dra.VY+1-Dra.DVY)<Math.abs(Dra.VY-1-Dra.DVY)){
+                                Dra.VY = Dra.VY+1;
+                            }
+                            if(Math.abs(Dra.VY+1-Dra.DVY)>Math.abs(Dra.VY-1-Dra.DVY)){
+                                Dra.VY = Dra.VY-1;
+                            }
                         }
-                    }
-                    if(Dra.VY != Dra.DVY){
-                        if(Math.abs(Dra.VY+1-Dra.DVY)<Math.abs(Dra.VY-1-Dra.DVY)){
-                            Dra.VY = Dra.VY+1;
-                        }
-                        if(Math.abs(Dra.VY+1-Dra.DVY)>Math.abs(Dra.VY-1-Dra.DVY)){
-                            Dra.VY = Dra.VY-1;
-                        }
-                    }
-                    if(Dra.VZ != Dra.DVZ){
-                        if(Math.abs(Dra.VZ+1-Dra.DVZ)<Math.abs(Dra.VZ-1-Dra.DVZ)){
-                            Dra.VZ = Dra.VZ+1;
-                        }
-                        if(Math.abs(Dra.VZ+1-Dra.DVZ)>Math.abs(Dra.VZ-1-Dra.DVZ)){
-                            Dra.VZ = Dra.VZ-1;
+                        if(Dra.VZ != Dra.DVZ){
+                            if(Math.abs(Dra.VZ+1-Dra.DVZ)<Math.abs(Dra.VZ-1-Dra.DVZ)){
+                                Dra.VZ = Dra.VZ+1;
+                            }
+                            if(Math.abs(Dra.VZ+1-Dra.DVZ)>Math.abs(Dra.VZ-1-Dra.DVZ)){
+                                Dra.VZ = Dra.VZ-1;
+                            }
                         }
                     }
                 }
-                if(Dra.Type=="Comida"){
+                if(Dra.Type=="Comida"&&Dra.Life=="alive"){
                     DrawCircleIn(PV,Dra.X,Dra.Y,5,'Blue');
                     DrawCircleIn(PH,Dra.Z,Dra.Y,5,'Blue');
-                    
-                    if(Dra.DVX==Dra.VX)if(Dra.DVY==Dra.VY)if(Dra.DVZ==Dra.VZ)if (GetRandom()*100>99) {
-                        Turn(Dra);
-                    }
+                    if(Toca){
+                        if(Dra.DVX==Dra.VX)if(Dra.DVY==Dra.VY)if(Dra.DVZ==Dra.VZ)if (GetRandom()*100>99) {
+                            Turn(Dra);
+                        }
 
-                    if(Dra.X + Dra.VX < PV.width-5 && Dra.X + Dra.VX>5){
-                        Dra.X = Dra.X + Dra.VX;
-                    } else Turn(Dra);
-                    if(Dra.Y + Dra.VY < PV.width-5 && Dra.Y + Dra.VY>5){
-                        Dra.Y = Dra.Y + Dra.VY;
-                    } else Turn(Dra);
-                    if(Dra.Z + Dra.VZ < PV.width-5 && Dra.Z + Dra.VZ>5){
-                        Dra.Z = Dra.Z + Dra.VZ;
-                    } else Turn(Dra);
-                    if(Dra.VX != Dra.DVX){
-                        if(Math.abs(Dra.VX+1-Dra.DVX)<Math.abs(Dra.VX-1-Dra.DVX)){
-                            Dra.VX = Dra.VX+1;
+                        if(Dra.X + Dra.VX < PV.width-5 && Dra.X + Dra.VX>5){
+                            Dra.X = Dra.X + Dra.VX;
+                        } else Turn(Dra);
+                        if(Dra.Y + Dra.VY < PV.width-5 && Dra.Y + Dra.VY>5){
+                            Dra.Y = Dra.Y + Dra.VY;
+                        } else Turn(Dra);
+                        if(Dra.Z + Dra.VZ < PV.width-5 && Dra.Z + Dra.VZ>5){
+                            Dra.Z = Dra.Z + Dra.VZ;
+                        } else Turn(Dra);
+                        if(Dra.VX != Dra.DVX){
+                            if(Math.abs(Dra.VX+1-Dra.DVX)<Math.abs(Dra.VX-1-Dra.DVX)){
+                                Dra.VX = Dra.VX+1;
+                            }
+                            if(Math.abs(Dra.VX+1-Dra.DVX)>Math.abs(Dra.VX-1-Dra.DVX)){
+                                Dra.VX = Dra.VX-1;
+                            }
                         }
-                        if(Math.abs(Dra.VX+1-Dra.DVX)>Math.abs(Dra.VX-1-Dra.DVX)){
-                            Dra.VX = Dra.VX-1;
+                        if(Dra.VY != Dra.DVY){
+                            if(Math.abs(Dra.VY+1-Dra.DVY)<Math.abs(Dra.VY-1-Dra.DVY)){
+                                Dra.VY = Dra.VY+1;
+                            }
+                            if(Math.abs(Dra.VY+1-Dra.DVY)>Math.abs(Dra.VY-1-Dra.DVY)){
+                                Dra.VY = Dra.VY-1;
+                            }
+                        }
+                        if(Dra.VZ != Dra.DVZ){
+                            if(Math.abs(Dra.VZ+1-Dra.DVZ)<Math.abs(Dra.VZ-1-Dra.DVZ)){
+                                Dra.VZ = Dra.VZ+1;
+                            }
+                            if(Math.abs(Dra.VZ+1-Dra.DVZ)>Math.abs(Dra.VZ-1-Dra.DVZ)){
+                                Dra.VZ = Dra.VZ-1;
+                            }
                         }
                     }
-                    if(Dra.VY != Dra.DVY){
-                        if(Math.abs(Dra.VY+1-Dra.DVY)<Math.abs(Dra.VY-1-Dra.DVY)){
-                            Dra.VY = Dra.VY+1;
-                        }
-                        if(Math.abs(Dra.VY+1-Dra.DVY)>Math.abs(Dra.VY-1-Dra.DVY)){
-                            Dra.VY = Dra.VY-1;
-                        }
-                    }
-                    if(Dra.VZ != Dra.DVZ){
-                        if(Math.abs(Dra.VZ+1-Dra.DVZ)<Math.abs(Dra.VZ-1-Dra.DVZ)){
-                            Dra.VZ = Dra.VZ+1;
-                        }
-                        if(Math.abs(Dra.VZ+1-Dra.DVZ)>Math.abs(Dra.VZ-1-Dra.DVZ)){
-                            Dra.VZ = Dra.VZ-1;
-                        }
-                    }
-                }   
+                }  
+                 
                 if(Dra.Type=="Player"){
+                     if(a){Dra.Z--;
+                    }if(d){Dra.Z++;
+                    }if(w||i){Dra.Y--;
+                    }if(s||k){Dra.Y++;
+                    }if(j){Dra.X--;
+                    }if(l){Dra.X++;
+                    }
                     DrawCircleIn(PV,Dra.X,Dra.Y,5,'Green');
                     DrawCircleIn(PH,Dra.Z,Dra.Y,5,'Green');
+
+                    for (let index = 0; index < DataBase.length; index++) {
+                        const element = DataBase[index];
+                        if(distanceFrom(Dra,element)<12){
+                            if(element.Type=="Comida"&&element.Life=="alive"){
+                                element.Life=="death"
+                                puntuation++;
+                            }
+                            if(element.Type=="TioXungo"&&element.Life=="alive"){
+                                Playing=false
+                                document.body.style.backgroundColor = "red";
+                                setTimeout(function(){
+                                    document.body.style.backgroundColor = "white";
+                                    setTimeout(function(){
+                                        document.body.style.backgroundColor = "red";
+                                        setTimeout(function(){
+                                            document.body.style.backgroundColor = "white";
+                                        }, 2000);
+                                    }, 2000);
+                                }, 2000);
+
+                            }
+                        }                        
+                    }
                 }
             }
             if(Playing){
-                console.log("Tick!!");
                 setTimeout(function() {
                     Wait()
                 }, Speed);
@@ -310,7 +353,7 @@
             }
             for (let index = 0; index < DataBase.length; index++) {
                 const element = DataBase[index];
-                if(distanceFrom(Dra,element)){
+                if(distanceFrom(Dra,element)<12){
                     ret = false;
                 }
                 
@@ -334,7 +377,6 @@
             var VYT = MenosUnoCeroOUno();
             var VZT = MenosUnoCeroOUno();
 
-            console.log("Turning! "+VXT+" - "+VYT+" - "+VYT);
             Dra.DVX = VXT
             Dra.DVY = VYT
             Dra.DVZ = VZT
@@ -342,29 +384,25 @@
 
         function MenosUnoCeroOUno() {
             let r = GetRandom()*1000;
-            console.log(r)
             if(r<333){
-                console.log("to -1")
                 return -1;
             }
             if(r>333)if(r<666){
-                console.log("to 0")
                 return 0;
             }
             if(r>666){
-                console.log("to 1")
                 return 1;
             }
         }
 
         function Wait(){
-            console.log("Tock!!")
             Tick();
         }
 
         function Launch() {
             document.getElementById("Options").style.display = "none";
             document.getElementById("MobileControls").style.display="none";
+            refreshInputs();
 
         }
         function OptionsTogle() {
@@ -372,7 +410,6 @@
             var boton = document.getElementById("options button");
             if (teniente.style.display == "none") {
                 teniente.style.display = "block";
-                console.log("block");
                 boton.innerHTML = "Advanced options [/\\]"
             } else {
                 teniente.style.display = "none";
@@ -381,10 +418,21 @@
         }
 
         function ApplyOptions() {
-            Food = document.getElementById("Food").value;
-            Enemies = document.getElementById("Enemies").value;
-            Dificulty = document.getElementById("Dificulty").value;
-            Speed = document.getElementById("Speed").value;
+            if (document.getElementById("Food").value) Food = document.getElementById("Food").value;
+            if (document.getElementById("Enemies").value) Enemies = document.getElementById("Enemies").value;
+            if (document.getElementById("Dificulty").value) Dificulty = document.getElementById("Dificulty").value;
+            if (document.getElementById("Speed").value) Speed = document.getElementById("Speed").value;
+            if (document.getElementById("cadaCuantoSeMueven").value) cadaCuantoSeMueven = document.getElementById("cadaCuantoSeMueven").value;
+            
+            refreshInputs()
+        }
+
+        function refreshInputs(){
+            document.getElementById("Food").placeholder = Food;
+            document.getElementById("Enemies").placeholder = Enemies;
+            document.getElementById("Dificulty").placeholder = Dificulty;
+            document.getElementById("Speed").placeholder = Speed;
+            document.getElementById("cadaCuantoSeMueven").placeholder = cadaCuantoSeMueven;
         }
 
         function DrawCircleIn(canvas,x,y,r,c) {
@@ -402,7 +450,6 @@
 
         window.onkeydown = function (e) {
             var code = e.keyCode ? e.keyCode : e.which;
-            
             if (code === 87) {w = true;
             } else if (code === 65) {a = true;
             } else if (code === 83) {s = true;
@@ -415,70 +462,61 @@
         };
         window.onkeyup = function (e) {
             var code = e.keyCode ? e.keyCode : e.which;
-            
-            if (code === 87) {
-                w = false;
-            } else if (code === 65) {
-                a = false;
-            } else if (code === 83) {
-                s = false;
-            } else if (code === 68) {
-                d = false;
-            } else if (code === 73) {
-                i = false;
-            } else if (code === 74) {
-                j = false;
-            } else if (code === 75) {
-                k = false;
-            } else if (code === 76) {
-                l = false;
+            if (code === 87) {w = false;
+            } else if (code === 65) {a = false;
+            } else if (code === 83) {s = false;
+            } else if (code === 68) {d = false;
+            } else if (code === 73) {i = false;
+            } else if (code === 74) {j = false;
+            } else if (code === 75) {k = false;
+            } else if (code === 76) {l = false;
             }
         };
 
         function aup(){
-            a = true;
+            a = false;
         }
         function adown(){
             a = true;
         }
         function wup(){
-            w = true;
+            w = false;
         }
         function wdown(){
             w = true;
         }
         function sup(){
-            s = true;
+            s = false;
         }
         function sdown(){
             s = true;
         }
         function dup(){
-            d = true;
+            d = false;
         }
         function ddown(){
             d = true;
         }
         function jup(){
-            j = true;
+            j = false;
         }
         function jdown(){
             j = true;
         }
         function iup(){
-            i = true;
+            i = false;
         }
         function idown(){
             i = true;
         }
         function kup(){
-            k = true;
+            k = false;
         }
         function kdown(){
             k = true;
         }
         function lup(){
-            l = true;
+            l = false;
         }
         function ldown(){
             l = true;
