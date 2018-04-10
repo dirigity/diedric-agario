@@ -31,6 +31,19 @@
         height: 150px;
         width: 150px;
         display: inline-block;
+        font-size: 1000%;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 150px; 
+
+    }
+    HalfSpacer{
+        height: 150px;
+        width: 75px;
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 150px; 
     }
     b{
         height: 140px;
@@ -49,9 +62,9 @@
     <canvas id="PV" width="440" height="440" onclick="PV"></canvas>
     <br>
     <caja style="padding: 2px; display: inline-block" id="MobileControls">
-        <Spacer>                                          </Spacer><Spacer><b onclick = "wdown()" on-release="wup()"></b></Spacer><Spacer>                                          </Spacer><Spacer>                                              </Spacer><Spacer><b onclick = "idown()" on-release="iup()"></b></Spacer><br>
-        <Spacer><b onclick = "adown()" on-release="aup()"></b></Spacer><Spacer>                                          </Spacer><Spacer><b onclick = "ddown()" on-release="dup()"></b></Spacer><Spacer><b onclick = "jdown()" on-release="jup()"></b></Spacer><Spacer>                                          </Spacer><Spacer><b onclick = "ldown()" on-release="lup()"></b></Spacer><br>
-        <Spacer>                                          </Spacer><Spacer><b onclick = "sdown()" on-release="sup()"></b></Spacer><Spacer>                                          </Spacer><Spacer>                                              </Spacer><Spacer><b onclick = "kdown()" on-release="kup()"></b></Spacer><br>
+        <Spacer>                                              </Spacer><Spacer><b onclick = "wdown()" on-release="wup()"></b></Spacer><HalfSpacer></HalfSpacer><Spacer id="Score">                                                          </Spacer><HalfSpacer></HalfSpacer><Spacer><b onclick = "idown()" on-release="iup()"></b></Spacer><br>
+        <Spacer><b on-press = "adown()" on-release="aup()"></b></Spacer><Spacer>                                              </Spacer><Spacer><b onclick = "ddown()" on-release="dup()"></b></Spacer><Spacer><b onclick = "jdown()" on-release="jup()"></b></Spacer><Spacer>                                              </Spacer><Spacer><b onclick = "ldown()" on-release="lup()"></b></Spacer><br>
+        <Spacer>                                              </Spacer><Spacer><b onclick = "sdown()" on-release="sup()"></b></Spacer><Spacer>                                              </Spacer><Spacer>                                              </Spacer><Spacer><b onclick = "kdown()" on-release="kup()"></b></Spacer><br>
     </caja>
     
     <Boton onclick="startGame()" id="MainButton">START!!</Boton><br><br>
@@ -69,7 +82,11 @@
             placeholder="10-100"  
             minlength="2" 
             maxlength="3"><br>
-
+            
+            <br><t>Enemies number: </t><input type="text" 
+            id="Enemies" 
+            placeholder="10-100"  
+            minlength="2" 
             maxlength="3"><br>
 
             <br><t>speed Time between ticks </t><input type="text" 
@@ -195,6 +212,7 @@
             return ret;
         }
         function Tick() {
+            document.getElementById("Score").innerHTML=puntuation;
             tickCounter++;
             let PH = document.getElementById("PH");
             let PV = document.getElementById("PV");
@@ -305,22 +323,33 @@
                         const element = DataBase[index];
                         if(distanceFrom(Dra,element)<12){
                             if(element.Type=="Comida"&&element.Life=="alive"){
-                                element.Life=="death"
+                                element.Life="death"
                                 puntuation++;
                             }
                             if(element.Type=="TioXungo"&&element.Life=="alive"){
-                                Playing=false
+                                startGame(),
                                 document.body.style.backgroundColor = "red";
                                 setTimeout(function(){
                                     document.body.style.backgroundColor = "white";
                                     setTimeout(function(){
-                                        document.body.style.backgroundColor = "red";
+                                        document.body.style.backgroundColor = "yellow";
                                         setTimeout(function(){
                                             document.body.style.backgroundColor = "white";
-                                        }, 2000);
-                                    }, 2000);
-                                }, 2000);
-
+                                            setTimeout(function(){
+                                                document.body.style.backgroundColor = "red";
+                                                setTimeout(function(){
+                                                    document.body.style.backgroundColor = "white";
+                                                    setTimeout(function(){
+                                                        document.body.style.backgroundColor = "yellow";
+                                                        setTimeout(function(){
+                                                            document.body.style.backgroundColor = "white";
+                                                        }, 100);
+                                                    }, 100);
+                                                }, 100);
+                                            }, 100);
+                                        }, 100);
+                                    }, 100);
+                                }, 100);
                             }
                         }                        
                     }
@@ -358,12 +387,11 @@
 
         function distanceFrom(Dra1,Dra2){
             var x1 = Dra1.X;
-            var x2 = Dra2.x;
-            var y1 = Dra1.y;
-            var y2 = Dra2.y;
-            var z1 = Dra1.z;
-            var z2 = Dra2.z;
-
+            var x2 = Dra2.X;
+            var y1 = Dra1.Y;
+            var y2 = Dra2.Y;
+            var z1 = Dra1.Z;
+            var z2 = Dra2.Z;
             return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
         }
 
@@ -429,6 +457,12 @@
             document.getElementById("Dificulty").placeholder = Dificulty;
             document.getElementById("Speed").placeholder = Speed;
             document.getElementById("cadaCuantoSeMueven").placeholder = cadaCuantoSeMueven;
+
+            document.getElementById("Food").value = "";
+            document.getElementById("Enemies").value = "";
+            document.getElementById("Dificulty").value = "";
+            document.getElementById("Speed").value = "";
+            document.getElementById("cadaCuantoSeMueven").value = "";
         }
 
         function DrawCircleIn(canvas,x,y,r,c) {
@@ -470,9 +504,12 @@
         };
 
         function aup(){
+            console.log("aup");
             a = false;
         }
         function adown(){
+            console.log("adown");
+
             a = true;
         }
         function wup(){
