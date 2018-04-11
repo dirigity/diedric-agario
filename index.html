@@ -62,9 +62,9 @@
     <canvas id="PV" width="440" height="440" onclick="PV"></canvas>
     <br>
     <caja style="padding: 2px; display: inline-block" id="MobileControls">
-        <Spacer>                                              </Spacer><Spacer><b onclick = "wdown()" on-release="wup()"></b></Spacer><HalfSpacer></HalfSpacer><Spacer id="Score">                                                          </Spacer><HalfSpacer></HalfSpacer><Spacer><b onclick = "idown()" on-release="iup()"></b></Spacer><br>
-        <Spacer><b on-press = "adown()" on-release="aup()"></b></Spacer><Spacer>                                              </Spacer><Spacer><b onclick = "ddown()" on-release="dup()"></b></Spacer><Spacer><b onclick = "jdown()" on-release="jup()"></b></Spacer><Spacer>                                              </Spacer><Spacer><b onclick = "ldown()" on-release="lup()"></b></Spacer><br>
-        <Spacer>                                              </Spacer><Spacer><b onclick = "sdown()" on-release="sup()"></b></Spacer><Spacer>                                              </Spacer><Spacer>                                              </Spacer><Spacer><b onclick = "kdown()" on-release="kup()"></b></Spacer><br>
+        <Spacer>                                                 </Spacer><Spacer><b onmousedown = "wdown()" onmouseup="wup()"></b></Spacer><HalfSpacer></HalfSpacer><Spacer id="Score">                                                      </Spacer><HalfSpacer></HalfSpacer><Spacer><b onmousedown = "idown()" onmouseup="iup()"></b></Spacer><br>
+        <Spacer><b onmousedown = "adown()" onmouseup="aup()"></b></Spacer><Spacer>                                                 </Spacer><Spacer><b onmousedown = "ddown()" onmouseup="dup()"></b></Spacer><Spacer><b onmousedown = "jdown()" onmouseup="jup()"></b></Spacer><Spacer>                                                 </Spacer><Spacer><b onmousedown = "ldown()" onmouseup="lup()"></b></Spacer><br>
+        <Spacer>                                                 </Spacer><Spacer><b onmousedown = "sdown()" onmouseup="sup()"></b></Spacer><Spacer>                                                 </Spacer><Spacer>                                                 </Spacer><Spacer><b onmousedown = "kdown()" onmouseup="kup()"></b></Spacer><br>
     </caja>
     
     <Boton onclick="startGame()" id="MainButton">START!!</Boton><br><br>
@@ -110,7 +110,7 @@
     </Caja>
 
     <script>
-        var Dificulty;
+        var Dificulty = 500;
         var Enemies = 4;
         var Food = 4;
         var WorldSize = 440;
@@ -309,12 +309,12 @@
                 }  
                  
                 if(Dra.Type=="Player"){
-                     if(a){Dra.Z--;
-                    }if(d){Dra.Z++;
-                    }if(w||i){Dra.Y--;
-                    }if(s||k){Dra.Y++;
-                    }if(j){Dra.X--;
-                    }if(l){Dra.X++;
+                     if(a&&Dra.Z-1>5){Dra.Z--;
+                    }if(d&&Dra.Z+1<WorldSize-5){Dra.Z++;
+                    }if((w||i)&&Dra.Y-1>5){Dra.Y--;
+                    }if((s||k)&&Dra.Y+1<WorldSize-5){Dra.Y++;
+                    }if(j&&Dra.X-1>5){Dra.X--;
+                    }if(l&&Dra.X+1<WorldSize-5){Dra.X++;
                     }
                     DrawCircleIn(PV,Dra.X,Dra.Y,5,'Green');
                     DrawCircleIn(PH,Dra.Z,Dra.Y,5,'Green');
@@ -325,6 +325,7 @@
                             if(element.Type=="Comida"&&element.Life=="alive"){
                                 element.Life="death"
                                 puntuation++;
+                                console.log("HIT")
                             }
                             if(element.Type=="TioXungo"&&element.Life=="alive"){
                                 startGame(),
@@ -396,7 +397,6 @@
         }
 
         function Turn(Dra) {
-            
             var VXT = MenosUnoCeroOUno();
             var VYT = MenosUnoCeroOUno();
             var VZT = MenosUnoCeroOUno();
@@ -404,6 +404,42 @@
             Dra.DVX = VXT
             Dra.DVY = VYT
             Dra.DVZ = VZT
+
+            if(Dra.Type=="TioXungo" && Dificulty>GetRandom()*999){
+                console.log("Turning");
+
+                Dra.DVX = 0
+                Dra.DVY = 0
+                Dra.DVZ = 0
+                var Obj;
+                for (let e = 0; e < DataBase.length; e++) {
+                    const element = DataBase[e];
+                    if(element.Type =="Player"){
+                        Obj = element;
+                    }
+                }
+                if(Dra.X<Obj.X){
+                    Dra.DVX=1;
+                }
+                if(Dra.X>Obj.X){
+                    Dra.DVX=-1;
+                }
+                if(Dra.Y<Obj.Y){
+                    Dra.DVY=1;
+                }
+                if(Dra.Y>Obj.Y){
+                    Dra.DVY=-1;
+                }
+                if(Dra.Z<Obj.Z){
+                    Dra.DVZ=1;
+                }
+                if(Dra.Z>Obj.Z){
+                    Dra.DVZ=-1;
+                }
+                setTimeout(function(){
+                    Turn(Dra);
+                }, 700);
+            }
         }
 
         function MenosUnoCeroOUno() {
