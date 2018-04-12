@@ -8,6 +8,13 @@
         padding-left: 4px;
         padding-right: 4px;
     }
+    Botons{
+        border: 3px solid Black;
+        padding: 1px;
+        padding-left: 4px;
+        padding-right: 4px;
+        font-size: 100px
+    }
     Caja{
         border: 3px solid Black;
         display: block;
@@ -62,12 +69,12 @@
     <canvas id="PV" width="440" height="440" onclick="PV"></canvas>
     <br>
     <caja style="padding: 2px; display: inline-block" id="MobileControls">
-        <Spacer>                                                 </Spacer><Spacer><b onmousedown = "wdown()" onmouseup="wup()"></b></Spacer><HalfSpacer></HalfSpacer><Spacer id="Score">                                                      </Spacer><HalfSpacer></HalfSpacer><Spacer><b onmousedown = "idown()" onmouseup="iup()"></b></Spacer><br>
-        <Spacer><b onmousedown = "adown()" onmouseup="aup()"></b></Spacer><Spacer>                                                 </Spacer><Spacer><b onmousedown = "ddown()" onmouseup="dup()"></b></Spacer><Spacer><b onmousedown = "jdown()" onmouseup="jup()"></b></Spacer><Spacer>                                                 </Spacer><Spacer><b onmousedown = "ldown()" onmouseup="lup()"></b></Spacer><br>
-        <Spacer>                                                 </Spacer><Spacer><b onmousedown = "sdown()" onmouseup="sup()"></b></Spacer><Spacer>                                                 </Spacer><Spacer>                                                 </Spacer><Spacer><b onmousedown = "kdown()" onmouseup="kup()"></b></Spacer><br>
+        <Spacer>                                                 </Spacer><Spacer><b unselectable="on" onmousedown = "wdown()" onmouseup="wup()" ontouchstart = "wdown()" ontouchend="wup()"></b></Spacer><HalfSpacer></HalfSpacer><Spacer id="Score">                                                      </Spacer><HalfSpacer></HalfSpacer><Spacer><b unselectable="on" onmousedown = "idown()" onmouseup="iup()" ontouchstart = "idown()" ontouchend="iup()"></b></Spacer><br>
+        <Spacer><b unselectable="on" onmousedown = "adown()" onmouseup="aup()" ontouchstart = "adown()" ontouchend="aup()"></b></Spacer><Spacer>                                                 </Spacer><Spacer><b unselectable="on" onmousedown = "ddown()" onmouseup="dup()" ontouchstart = "ddown()" ontouchend="dup()"></b></Spacer><Spacer><b unselectable="on" onmousedown = "jdown()" onmouseup="jup()" ontouchstart = "jdown()" ontouchend="jup()"></b></Spacer><Spacer>                                                 </Spacer><Spacer><b unselectable="on" onmousedown = "ldown()" onmouseup="lup()" ontouchstart = "ldown()" ontouchend="lup()"></b></Spacer><br>
+        <Spacer>                                                 </Spacer><Spacer><b unselectable="on" onmousedown = "sdown()" onmouseup="sup()" ontouchstart = "sdown()" ontouchend="sup()"></b></Spacer><Spacer>                                                 </Spacer><Spacer>                                                 </Spacer><Spacer><b unselectable="on" onmousedown = "kdown()" onmouseup="kup()" ontouchstart = "kdown()" ontouchend="kup()"></b></Spacer><br>
     </caja>
     
-    <Boton onclick="startGame()" id="MainButton">START!!</Boton><br><br>
+    <Botons onclick="startGame()" id="MainButton">START!!</Botons><br><br>
     <Caja>
         <Boton onclick="OptionsTogle()" id="options button">Advanced options [\/]</Boton>
         <teniente id="Options">
